@@ -31,6 +31,10 @@ const JobList = () => {
     fetchJobs();
   }, [page]);
 
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
   const handleScroll = (e) => {
     const { scrollTop, clientHeight, scrollHeight } = e.target.documentElement;
     if (scrollTop + clientHeight >= scrollHeight - 20 && hasMore) {
@@ -46,7 +50,7 @@ const JobList = () => {
   return (
     <div className="p-6 flex flex-col gap-6">
       {jobs.map((job, idx) => (
-        <JobMatchCard key={idx} content={job} layout="list" />
+        <JobMatchCard key={idx} content={job} src={"vert"} layout="list" />
       ))}
 
       {!hasMore && <p className="text-center text-gray-500">No more jobs.</p>}

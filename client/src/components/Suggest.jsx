@@ -1,25 +1,66 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { JobState } from "../StoreContext/Providers";
-import { URL } from "../constants/constants";
+import { NominatimURL, URL } from "../constants/constants";
 import axios from "axios";
 
-const allLocations = [
-  "Mumbai, Maharashtra",
-  "Pune, Maharashtra",
-  "Delhi, Maharashtra",
-  "Bangalore, Maharashtra",
-  "Chennai, Maharashtra",
-  "Hyderabad, Maharashtra",
-];
 const allSkills = [
-  "JavaScript",
-  "React",
-  "Node.js",
-  "MongoDB",
-  "Python",
-  "CSS",
-  "Tailwind",
-  "Express",
+  // Tech & Development
+  "Frontend Developer",
+  "Backend Developer",
+  "Full Stack Developer",
+  "Mobile App Developer",
+  "DevOps Engineer",
+  "Software Engineer",
+
+  // Data & AI
+  "Data Scientist",
+  "Data Analyst",
+  "Machine Learning Engineer",
+  "AI Researcher",
+  "Business Intelligence Analyst",
+
+  // Design & Creative
+  "UI/UX Designer",
+  "Graphic Designer",
+  "Product Designer",
+  "Motion Graphics Artist",
+
+  // Marketing & Writing
+  "Content Writer",
+  "SEO Specialist",
+  "Digital Marketing Manager",
+  "Social Media Strategist",
+  "Copywriter",
+
+  // Business & Management
+  "Project Manager",
+  "Business Analyst",
+  "Product Manager",
+  "Operations Manager",
+
+  // Finance
+  "Financial Analyst",
+  "Accountant",
+  "Investment Banker",
+  "Auditor",
+
+  // HR & Support
+  "HR Manager",
+  "Recruiter",
+  "Customer Support Specialist",
+  "Technical Support Engineer",
+
+  // Cybersecurity & IT
+  "Cybersecurity Analyst",
+  "Network Administrator",
+  "IT Support Technician",
+  "Security Engineer",
+
+  // Education
+  "Online Tutor",
+  "Curriculum Designer",
+  "Education Consultant",
+  "E-learning Developer",
 ];
 
 export default function Suggest() {
@@ -66,14 +107,23 @@ export default function Suggest() {
     }
   };
 
+  useEffect(() => {
+    const getData = setTimeout(async () => {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const locData = await axios.get(`${URL}/misc?q=${location}`, config);
+      setLocationSuggestions(locData?.data);
+    }, 1000);
+
+    return () => clearTimeout(getData);
+  }, [location]);
+
   const handleLocationChange = (e) => {
     const value = e.target.value;
     setLocation(value);
-    setLocationSuggestions(
-      allLocations.filter((loc) =>
-        loc.toLowerCase().includes(value.toLowerCase())
-      )
-    );
   };
 
   const handleSkillChange = (e) => {
@@ -134,19 +184,21 @@ export default function Suggest() {
             placeholder="Location"
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
-          {locationSuggestions.length > 0 && (
-            <ul className="absolute z-10 mt-1 bg-white border border-gray-300 rounded shadow max-h-40 overflow-auto">
-              {locationSuggestions.map((loc, i) => (
-                <li
-                  key={i}
-                  onClick={() => selectLocation(loc)}
-                  className="px-4 py-2 hover:bg-indigo-100 cursor-pointer"
-                >
-                  {loc}
-                </li>
-              ))}
-            </ul>
-          )}
+          {locationSuggestions
+            ? locationSuggestions.length > 0 && (
+                <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded shadow max-h-40 overflow-auto">
+                  {locationSuggestions.map((loc, i) => (
+                    <li
+                      key={i}
+                      onClick={() => selectLocation(loc?.display_name)}
+                      className="text-sm hover:bg-indigo-100 cursor-pointer"
+                    >
+                      {loc?.display_name}
+                    </li>
+                  ))}
+                </ul>
+              )
+            : ""}
         </div>
 
         {/* Skills Input */}

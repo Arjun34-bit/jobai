@@ -61,8 +61,6 @@ const getJobs = async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
 
-    console.log({ page, limit, skip });
-
     const totalJobs = await Job.countDocuments();
     const jobs = await Job.find()
       .sort({ createdAt: -1 })
