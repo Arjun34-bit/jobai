@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { URL } from "../constants/constants";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -9,11 +10,11 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const res = await axios.post("http://localhost:5000/api/login", {
+    const res = await axios.post(`${URL}/auth/login`, {
       email,
       password,
     });
-    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("userInfo", JSON.stringify(res.data));
     navigate("/dashboard");
   };
 

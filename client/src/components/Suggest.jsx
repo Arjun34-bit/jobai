@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { JobState } from "../StoreContext/Providers";
+import { URL } from "../constants/constants";
+import axios from "axios";
 
 const allLocations = [
   "Mumbai, Maharashtra",
@@ -19,7 +22,7 @@ const allSkills = [
   "Express",
 ];
 
-export default function Suggest({ onSuggest }) {
+export default function Suggest() {
   const [location, setLocation] = useState("");
   const [skills, setSkills] = useState("");
   const [experience, setExperience] = useState("");
@@ -27,8 +30,40 @@ export default function Suggest({ onSuggest }) {
   const [locationSuggestions, setLocationSuggestions] = useState([]);
   const [skillSuggestions, setSkillSuggestions] = useState([]);
 
-  const handleSuggest = () => {
-    onSuggest({ location, skills: skills.split(","), experience });
+  const { user, setSugg, err, setErr, setSuggLoading } = JobState();
+
+  const handleSuggest = async () => {
+    try {
+      setSuggLoading(true);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const res = await axios.post(
+        `${URL}/job/getRecommendations`,
+        { location, skills: skills.split(","), experience },
+        config
+      );
+      setSuggLoading(false);
+
+      setSugg(JSON.parse(res?.data?.data?.matches));
+      localStorage.setItem("jobs", JSON.stringify(res?.data?.data?.matches));
+      localStorage.setItem(
+        "payloads",
+        JSON.stringify({
+          location: location,
+          skills: skills,
+          experience: experience,
+        })
+      );
+    } catch (error) {
+      setSuggLoading(false);
+      setErr(error);
+
+      console.log(err);
+    }
   };
 
   const handleLocationChange = (e) => {
@@ -67,6 +102,24 @@ export default function Suggest({ onSuggest }) {
     }
     setSkills(existing.join(", "));
     setSkillSuggestions([]);
+  };
+
+  const handlePrevious = () => {
+    const jobs = JSON.parse(localStorage.getItem("jobs"));
+    setSugg(JSON.parse(jobs));
+
+    const payloads = JSON.parse(localStorage.getItem("payloads"));
+    setLocation(payloads?.location);
+    setSkills(payloads?.skills);
+    setExperience(payloads?.experience);
+  };
+
+  const handleClear = () => {
+    setLocation("");
+    setSkills("");
+    setExperience("");
+
+    setSugg("");
   };
 
   return (
@@ -136,6 +189,20 @@ export default function Suggest({ onSuggest }) {
         >
           Suggest
         </button>
+      </div>
+      <div className="flex gap-2 items-center">
+        <div
+          className="ml-3 mt-3 bg-blue-300 border-2 border-blue-600 rounded rounded-lg p-1 w-fit text-sm font-semibold cursor-pointer"
+          onClick={handlePrevious}
+        >
+          use previous preference
+        </div>
+        <div
+          className="ml-3 mt-3 bg-red-300 border-2 border-red-600 rounded rounded-lg p-1 w-fit text-sm font-semibold cursor-pointer"
+          onClick={handleClear}
+        >
+          <span className="text-red-800">X</span> Clear
+        </div>
       </div>
     </div>
   );
