@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cors());
 app.use(
   cors({
-    origin: "https://jobai-26x8.onrender.com/",
+    origin: "https://jobai-k9mu.vercel.app/",
     credentials: true,
   })
 );
