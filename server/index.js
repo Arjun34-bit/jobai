@@ -14,12 +14,12 @@ dotenv.config();
 connectDB();
 app.use(express.json());
 app.use(cors());
-app.use(
-  cors({
-    origin: "https://jobai-k9mu.vercel.app",
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: "https://jobai-k9mu.vercel.app",
+//     credentials: true,
+//   })
+// );
 
 app.use("/api/auth", userRoutes);
 app.use("/api/job", jobRoutes);
