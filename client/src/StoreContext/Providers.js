@@ -4,9 +4,9 @@ import { createContext, useContext, useState, useEffect } from "react";
 const JobContext = createContext();
 
 const Provider = ({ children }) => {
-  // ✅ Initialize user directly from localStorage
+  let userInfo;
   const [user, setUser] = useState(() => {
-    const userInfo = localStorage.getItem("userInfo");
+    userInfo = localStorage.getItem("userInfo");
     return userInfo ? JSON.parse(userInfo) : null;
   });
 
@@ -20,7 +20,8 @@ const Provider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
+    const currentPath = window.location.pathname;
+    if (!userInfo && currentPath !== "/" && currentPath !== "/login") {
       navigate("/");
     }
   }, [user, navigate]);

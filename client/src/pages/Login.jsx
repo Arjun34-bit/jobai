@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { URL } from "../constants/constants";
 
@@ -41,12 +41,9 @@ export default function Login() {
         </button>
         <div className="flex justify-center items-center mt-2 gap-2">
           <span>new to JOBAI</span>
-          <span
-            className="text-blue-400 text-underline cursor-pointer"
-            onClick={() => navigate("/")}
-          >
-            Register
-          </span>
+          <Link to="/" className="text-blue-400 underline cursor-pointer">
+            Login
+          </Link>
         </div>
       </form>
     </div>
