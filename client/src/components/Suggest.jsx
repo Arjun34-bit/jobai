@@ -1,74 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { JobState } from "../StoreContext/Providers";
-import { NominatimURL, URL } from "../constants/constants";
+import { allRoles, allSkills, NominatimURL, URL } from "../constants/constants";
 import axios from "axios";
-
-const allSkills = [
-  // Tech & Development
-  "Frontend Developer",
-  "Backend Developer",
-  "Full Stack Developer",
-  "Mobile App Developer",
-  "DevOps Engineer",
-  "Software Engineer",
-
-  // Data & AI
-  "Data Scientist",
-  "Data Analyst",
-  "Machine Learning Engineer",
-  "AI Researcher",
-  "Business Intelligence Analyst",
-
-  // Design & Creative
-  "UI/UX Designer",
-  "Graphic Designer",
-  "Product Designer",
-  "Motion Graphics Artist",
-
-  // Marketing & Writing
-  "Content Writer",
-  "SEO Specialist",
-  "Digital Marketing Manager",
-  "Social Media Strategist",
-  "Copywriter",
-
-  // Business & Management
-  "Project Manager",
-  "Business Analyst",
-  "Product Manager",
-  "Operations Manager",
-
-  // Finance
-  "Financial Analyst",
-  "Accountant",
-  "Investment Banker",
-  "Auditor",
-
-  // HR & Support
-  "HR Manager",
-  "Recruiter",
-  "Customer Support Specialist",
-  "Technical Support Engineer",
-
-  // Cybersecurity & IT
-  "Cybersecurity Analyst",
-  "Network Administrator",
-  "IT Support Technician",
-  "Security Engineer",
-
-  // Education
-  "Online Tutor",
-  "Curriculum Designer",
-  "Education Consultant",
-  "E-learning Developer",
-];
 
 export default function Suggest() {
   const [location, setLocation] = useState("");
+  const [role, setRole] = useState("");
   const [skills, setSkills] = useState("");
   const [experience, setExperience] = useState("");
 
   const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [roleSuggestions, setRoleSuggestions] = useState([]);
   const [skillSuggestions, setSkillSuggestions] = useState([]);
 
   const { user, setSugg, err, setErr, setSuggLoading } = JobState();
@@ -84,7 +26,7 @@ export default function Suggest() {
 
       const res = await axios.post(
         `${URL}/job/getRecommendations`,
-        { location, skills: skills.split(","), experience },
+        { location, role: role, skills: skills.split(","), experience },
         config
       );
       setSuggLoading(false);
@@ -95,6 +37,7 @@ export default function Suggest() {
         "payloads",
         JSON.stringify({
           location: location,
+          role: role,
           skills: skills,
           experience: experience,
         })
@@ -126,6 +69,12 @@ export default function Suggest() {
     setLocation(value);
   };
 
+  const handleRoleChange = (e) => {
+    const value = e.target.value;
+    setRole(value);
+    setRoleSuggestions(allRoles.filter((r) => r.toLowerCase()));
+  };
+
   const handleSkillChange = (e) => {
     const value = e.target.value;
     setSkills(value);
@@ -140,6 +89,11 @@ export default function Suggest() {
   const selectLocation = (loc) => {
     setLocation(loc);
     setLocationSuggestions([]);
+  };
+
+  const selectRole = (role) => {
+    setRole(role);
+    setRoleSuggestions([]);
   };
 
   const selectSkill = (skill) => {
@@ -160,12 +114,14 @@ export default function Suggest() {
 
     const payloads = JSON.parse(localStorage.getItem("payloads"));
     setLocation(payloads?.location);
+    setRole(payloads?.role);
     setSkills(payloads?.skills);
     setExperience(payloads?.experience);
   };
 
   const handleClear = () => {
     setLocation("");
+    setRole("");
     setSkills("");
     setExperience("");
 
@@ -199,6 +155,30 @@ export default function Suggest() {
                 </ul>
               )
             : ""}
+        </div>
+
+        {/* JobRole Input */}
+        <div className="relative flex-1">
+          <input
+            type="text"
+            value={role}
+            onChange={handleRoleChange}
+            placeholder="Job Role"
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          />
+          {roleSuggestions.length > 0 && (
+            <ul className="absolute z-10 mt-1 bg-white border border-gray-300 rounded shadow max-h-40 overflow-auto">
+              {roleSuggestions.map((ro, i) => (
+                <li
+                  key={i}
+                  onClick={() => selectRole(ro)}
+                  className="px-4 py-2 hover:bg-indigo-100 cursor-pointer"
+                >
+                  {ro}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Skills Input */}
@@ -237,9 +217,9 @@ export default function Suggest() {
         {/* Suggest Button */}
         <button
           onClick={handleSuggest}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-small rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
         >
-          Suggest
+          Find My Matches
         </button>
       </div>
       <div className="flex gap-2 items-center">

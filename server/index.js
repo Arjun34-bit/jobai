@@ -13,7 +13,13 @@ dotenv.config();
 
 connectDB();
 app.use(express.json());
-app.use(cors());
+// app.use(cors());
+app.use(
+  cors({
+    origin: "https://jobai-26x8.onrender.com/",
+    credentials: true,
+  })
+);
 
 app.use("/api/auth", userRoutes);
 app.use("/api/job", jobRoutes);
