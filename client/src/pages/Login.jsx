@@ -6,16 +6,26 @@ import { URL } from "../constants/constants";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    const res = await axios.post(`${URL}/auth/login`, {
-      email,
-      password,
-    });
-    localStorage.setItem("userInfo", JSON.stringify(res.data));
-    navigate("/dashboard");
+    try {
+      setLoading(true);
+      e.preventDefault();
+      const res = await axios.post(`${URL}/auth/login`, {
+        email,
+        password,
+      });
+      localStorage.setItem("userInfo", JSON.stringify(res.data));
+      setLoading(false);
+      navigate("/dashboard");
+    } catch (error) {
+      setLoading(false);
+      alert(error.message);
+    }
   };
 
   return (
@@ -37,7 +47,7 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
         />
         <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded">
-          Login
+          {loading ? "Loggin In" : "Login"}
         </button>
         <div className="flex justify-center items-center mt-2 gap-2">
           <span>new to JOBAI</span>
